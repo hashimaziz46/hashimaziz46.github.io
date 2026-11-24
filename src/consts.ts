@@ -62,10 +62,10 @@ export const SITE_METADATA = {
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: '/images/og-image.png',
+        url: '/images/og-hashim-aziz.png',
         width: 1200,
         height: 630,
-        alt: SITE_TITLE,
+        alt: `${PROFILE.name}, ${PROFILE.role}`,
         type: 'image/png'
       }
     ]
@@ -76,7 +76,7 @@ export const SITE_METADATA = {
     creator: '',
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: ['/images/og-image.png']
+    images: ['/images/og-hashim-aziz.png']
   },
   verification: {
     google: '', // Add your Google verification code

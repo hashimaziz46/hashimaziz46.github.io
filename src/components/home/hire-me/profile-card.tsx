@@ -89,13 +89,20 @@ const ProfileCard = ({ className }: { className?: string }) => {
             </CardContent>
           </Card>
 
-          <Card
-            style={{ backgroundImage: "url('/images/hire-me/card-back-bg.webp')" }}
-            className='absolute inset-0 transform-[rotateY(180deg)] overflow-hidden rounded-[24px] bg-black bg-cover bg-center text-white shadow-lg ring-0 backface-hidden dark:ring dark:ring-white/20'
-          >
+          {/* Back: the site's orange, with a soft dot grid and glow instead of a photo */}
+          <Card className='from-accent absolute inset-0 transform-[rotateY(180deg)] overflow-hidden rounded-[24px] bg-linear-to-br to-red-600 text-white shadow-lg ring-0 backface-hidden dark:ring dark:ring-white/20'>
+            <div
+              aria-hidden='true'
+              className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgb(255_255_255/0.22)_1px,transparent_1.5px)] mask-[linear-gradient(to_bottom_left,black,transparent_70%)] bg-size-[14px_14px]'
+            />
+            <div
+              aria-hidden='true'
+              className='pointer-events-none absolute -top-16 -right-16 size-48 rounded-full bg-white/20 blur-2xl'
+            />
+
             <CardContent className='relative flex h-full flex-col justify-between gap-6'>
               <div>
-                <p className='text-xs text-white/60'>{PROFILE.name}</p>
+                <p className='text-xs text-white/75'>{PROFILE.name}</p>
                 <h3 className='text-base font-medium'>Building software since 2021</h3>
               </div>
 
@@ -103,7 +110,7 @@ const ProfileCard = ({ className }: { className?: string }) => {
                 <p className='text-base'>
                   I bridge technical and business goals so teams ship predictably and clients stay for the long term.
                 </p>
-                <Avatar className='h-24.5 w-20.5 shrink-0 rounded-[12px]'>
+                <Avatar className='h-24.5 w-20.5 shrink-0 rounded-[12px] shadow-lg ring-2 ring-white/70'>
                   <AvatarImage src='/images/hashim/avatar.webp' alt={PROFILE.name} className='rounded-[12px]' />
                   <AvatarFallback>{PROFILE.initials}</AvatarFallback>
                 </Avatar>

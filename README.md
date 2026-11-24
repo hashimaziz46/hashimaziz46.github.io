@@ -2,7 +2,7 @@
 
 Portfolio of Hashim Aziz, Project Manager & Scrum Master. Live at https://hashimaziz46.github.io.
 
-Built with [Astro](https://astro.build), React and Tailwind CSS, starting from the free Zolt template by shadcn/studio (see `LICENSE.md`).
+Built with [Astro](https://astro.build), React and Tailwind CSS, starting from a free template by shadcn/studio (see `LICENSE.md`).
 
 ## Run locally
 

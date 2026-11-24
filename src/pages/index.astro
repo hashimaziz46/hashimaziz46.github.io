@@ -17,16 +17,11 @@ const pageDescription = SITE_DESCRIPTION
 const pageKeywords = 'project manager, scrum master, technical delivery lead, agile delivery, Hashim Aziz'
 
 const schema = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: PROFILE.name,
-      description: `${PROFILE.role} based in ${PROFILE.location}.`,
-      inLanguage: 'en-US'
-    }
-  ]
+  '@type': 'ProfilePage',
+  url: Astro.site?.toString(),
+  name: `${PROFILE.name} - ${PROFILE.role}`,
+  description: pageDescription,
+  mainEntity: { '@id': `${Astro.site}#person` }
 }
 ---
 

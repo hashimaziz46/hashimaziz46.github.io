@@ -8,7 +8,6 @@ import { Badge } from '@/components/ui/badge'
 import FeaturedWorks from '@/components/shared/featured-works/featured-works.astro'
 import ReadingProgressPill from '@/components/case-study/reading-progress-pill'
 import { mdxComponents } from '@/components/case-study/mdx-components'
-import { PROFILE } from '@/consts'
 
 import UsersGroupIcon from '@/assets/svg/users-group-icon'
 import CalendarIcon from '@/assets/svg/calendar-icon'
@@ -42,23 +41,29 @@ const metaItems = [
   { label: 'Duration', value: data.duration, icon: CalendarIcon }
 ].filter(item => item.value)
 
+const pageUrl = new URL(`/case-study/${data.slug}/`, Astro.site).toString()
+
 const schema = {
-  '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'BlogPosting',
+      '@type': 'Article',
+      '@id': `${pageUrl}#article`,
+      url: pageUrl,
+      mainEntityOfPage: pageUrl,
       headline: data.title,
       description: data.description,
       datePublished: data.publishedAt,
-      author: { '@type': 'Person', name: PROFILE.name },
+      image: new URL(data.logo ?? '/images/og-hashim-aziz.png', Astro.site).toString(),
+      author: { '@id': `${Astro.site}#person` },
+      publisher: { '@id': `${Astro.site}#person` },
       keywords: data.tools?.join(', '),
-      articleSection: data.organisation
+      about: data.organisation
     },
     {
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
-        { '@type': 'ListItem', position: 2, name: data.title, item: `/case-study/${data.slug}/` }
+        { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.site?.toString() },
+        { '@type': 'ListItem', position: 2, name: data.title, item: pageUrl }
       ]
     }
   ]

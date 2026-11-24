@@ -13,22 +13,11 @@ const pageTitle = 'Contact'
 const pageDescription = `Get in touch with ${PROFILE.name} about Project Manager roles, delivery consulting or Agile coaching.`
 
 const schema = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: PROFILE.name,
-      description: `${PROFILE.role} based in ${PROFILE.location}.`,
-      inLanguage: 'en-US'
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'WebPage',
-      name: pageTitle,
-      description: pageDescription
-    }
-  ]
+  '@type': 'ContactPage',
+  url: new URL('/contact/', Astro.site).toString(),
+  name: `Contact ${PROFILE.name}`,
+  description: pageDescription,
+  about: { '@id': `${Astro.site}#person` }
 }
 ---
 

@@ -1,5 +1,5 @@
 ---
-import { SITE_METADATA } from '@/consts'
+import { PROFILE, SITE_DESCRIPTION, SITE_METADATA } from '@/consts'
 
 interface Props {
   title?: string
@@ -41,25 +41,57 @@ const finalAuthor = author || SITE_METADATA.authors[0].name
 // Robots meta tag
 const robotsContent = `${noindex || !SITE_METADATA.robots.index ? 'noindex' : 'index'}, ${nofollow || !SITE_METADATA.robots.follow ? 'nofollow' : 'follow'}, max-image-preview:large, max-snippet:-1, max-video-preview:-1`
 
-// Default schema.org structured data
-const defaultSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: SITE_METADATA.openGraph.siteName,
-  url: Astro.site?.toString(),
-  description: finalDescription,
-  inLanguage: SITE_METADATA.language.split('-')[0],
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: {
-      '@type': 'EntryPoint',
-      urlTemplate: `${Astro.site}search?q={search_term_string}`
-    },
-    'query-input': 'required name=search_term_string'
-  }
+// Structured data: every page describes the site and the person behind it, so search engines
+// can connect the pages to Hashim's name, role and LinkedIn. Pages add their own nodes on top.
+const siteUrl = Astro.site?.toString() ?? '/'
+const personId = `${siteUrl}#person`
+const websiteId = `${siteUrl}#website`
+
+const personSchema = {
+  '@type': 'Person',
+  '@id': personId,
+  name: PROFILE.name,
+  jobTitle: PROFILE.role,
+  description: SITE_DESCRIPTION,
+  url: siteUrl,
+  image: new URL('/images/hashim/avatar.webp', Astro.site).toString(),
+  sameAs: [PROFILE.linkedin],
+  address: { '@type': 'PostalAddress', addressLocality: 'Islamabad', addressCountry: 'PK' },
+  worksFor: { '@type': 'Organization', name: 'Geeks Ltd' },
+  knowsAbout: [
+    'Project management',
+    'Scrum',
+    'Agile delivery',
+    'Roadmap planning',
+    'Stakeholder management',
+    'SOX compliance',
+    'Software engineering'
+  ]
 }
 
-const schemaData = schema || defaultSchema
+const websiteSchema = {
+  '@type': 'WebSite',
+  '@id': websiteId,
+  url: siteUrl,
+  name: PROFILE.name,
+  description: SITE_DESCRIPTION,
+  inLanguage: 'en-US',
+  publisher: { '@id': personId }
+}
+
+// Page nodes, minus any nested @context and the site-wide nodes this file already adds
+const pageNodes = ((schema?.['@graph'] ?? (schema ? [schema] : [])) as Record<string, any>[])
+  .filter(node => node['@type'] !== 'WebSite')
+  .map(node => {
+    const { '@context': _context, ...rest } = node // eslint-disable-line @typescript-eslint/no-unused-vars
+
+    return rest
+  })
+
+const schemaData = {
+  '@context': 'https://schema.org',
+  '@graph': [personSchema, websiteSchema, ...pageNodes]
+}
 ---
 
 <!-- Essential Meta Tags -->
@@ -86,7 +118,7 @@ const schemaData = schema || defaultSchema
 <meta name='bingbot' content={robotsContent} />
 
 <!-- Sitemap -->
-<link rel='sitemap' href='/sitemap-index.xml' />
+<link rel='sitemap' type='application/xml' href='/sitemap-index.xml' />
 
 <!-- Verification (if provided) -->
 {
@@ -106,17 +138,6 @@ const schemaData = schema || defaultSchema
 {SITE_METADATA.icons.apple.map(icon => <link rel='apple-touch-icon' sizes={icon.sizes} href={icon.url} />)}
 {SITE_METADATA.icons.shortcut.map(icon => <link rel='shortcut icon' href={icon.url} />)}
 <link rel='manifest' href='/site.webmanifest' />
-
-<!-- Sitemap -->
-<link rel='sitemap' href='/sitemap.xml' />
-
-<!-- RSS Feed -->
-<link
-  rel='alternate'
-  type='application/rss+xml'
-  title={`${SITE_METADATA.title.default} RSS Feed`}
-  href={new URL('rss.xml', Astro.site)}
-/>
 
 <!-- Open Graph / Facebook -->
 <meta property='og:type' content={type} />
