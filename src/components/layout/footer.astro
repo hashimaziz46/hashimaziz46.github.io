@@ -1,0 +1,49 @@
+---
+import { buttonVariants } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+
+import { PROFILE } from '@/consts'
+import { cn } from '@/lib/utils'
+
+const socials = [
+  { label: 'Email', src: '/images/footer/gmail.webp', href: `mailto:${PROFILE.email}` },
+  { label: 'LinkedIn', src: '/images/footer/linkedin.webp', href: PROFILE.linkedin }
+]
+
+const year = new Date().getFullYear()
+---
+
+<footer class='lg:px-10.5'>
+  <div class='mx-auto max-w-4xl space-y-12 pb-12 lg:border-x xl:max-w-245'>
+    <div class='flex items-center gap-3'>
+      <Separator className='flex-1' />
+      <div class='flex items-center gap-3'>
+        {
+          socials.map(social => (
+            <a
+              href={social.href}
+              target='_blank'
+              rel='noopener noreferrer'
+              aria-label={social.label}
+              class={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'hover:bg-muted/5 min-w-10 rounded-md')}
+            >
+              <img src={social.src} alt={social.label} width={16} height={16} />
+            </a>
+          ))
+        }
+      </div>
+      <Separator className='flex-1' />
+    </div>
+
+    <div class='mb-8 flex items-center justify-center gap-5 text-center max-lg:hidden xl:ml-8'>
+      <p class='text-muted-foreground'>Thank you, for visiting here</p>
+      <img src='/images/footer/tree-seal.webp' alt='Seal' class='size-25' />
+      <p class='text-muted-foreground'>Let's deliver something great</p>
+    </div>
+
+    <div class='-ml-5 space-y-1 text-center'>
+      <p class='mx-auto mb-2 -rotate-3 [font-family:var(--font-handwritten)] text-5xl'>{PROFILE.name}</p>
+      <p class='text-xs'>© {PROFILE.name} {year}</p>
+    </div>
+  </div>
+</footer>

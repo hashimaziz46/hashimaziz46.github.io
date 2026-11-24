@@ -1,0 +1,41 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Hero from '@/components/home/hero/hero.astro'
+import About from '@/components/home/about/about.astro'
+import FeaturedWorks from '@/components/shared/featured-works/featured-works.astro'
+import Experience from '@/components/home/experience/experience.astro'
+import Services from '@/components/shared/services/services'
+import HireMe from '@/components/home/hire-me/hire-me.astro'
+import SelectService from '@/components/home/select-service/select-service.astro'
+
+import { getCaseStudies } from '@/lib/case-studies'
+import { PROFILE, SITE_DESCRIPTION } from '@/consts'
+
+const caseStudies = await getCaseStudies()
+
+const pageDescription = SITE_DESCRIPTION
+const pageKeywords = 'project manager, scrum master, technical delivery lead, agile delivery, Hashim Aziz'
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: PROFILE.name,
+      description: `${PROFILE.role} based in ${PROFILE.location}.`,
+      inLanguage: 'en-US'
+    }
+  ]
+}
+---
+
+<Layout description={pageDescription} keywords={pageKeywords} schema={schema}>
+  <Hero />
+  <About />
+  <FeaturedWorks caseStudies={caseStudies} />
+  <Experience />
+  <Services client:visible />
+  <HireMe />
+  <SelectService />
+</Layout>

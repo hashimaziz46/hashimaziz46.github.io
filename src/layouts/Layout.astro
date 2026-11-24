@@ -1,0 +1,208 @@
+---
+import '@/styles/global.css'
+
+import { ClientRouter } from 'astro:transitions'
+
+import HeadSeo from '@/layouts/HeadSeo.astro'
+import EdgeBlur from '@/components/layout/edge-blur.astro'
+import Footer from '@/components/layout/footer.astro'
+import NavDock from '@/components/layout/nav-dock'
+import ScrollProfileToast from '@/components/layout/scroll-profile-toast'
+import { Toaster } from '@/components/ui/sonner'
+
+interface Props {
+  title?: string
+  description?: string
+  image?: string
+  type?: 'website' | 'article'
+  keywords?: string
+  author?: string
+  publishedTime?: string
+  modifiedTime?: string
+  noindex?: boolean
+  nofollow?: boolean
+  schema?: Record<string, any>
+}
+
+const seoProps = Astro.props as Props
+---
+
+<!doctype html>
+<html lang='en' class='scroll-smooth antialiased'>
+  <head>
+    <HeadSeo {...seoProps} />
+    <ClientRouter />
+    <script is:inline>
+      ;(function () {
+        const getTheme = () => {
+          if (typeof localStorage !== 'undefined') {
+            const stored = localStorage.getItem('theme')
+            if (stored === 'light' || stored === 'dark') {
+              return stored
+            }
+          }
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+
+        const applyTheme = () => {
+          const theme = getTheme()
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark')
+          } else {
+            document.documentElement.classList.remove('dark')
+          }
+        }
+
+        // Apply theme immediately on initial load
+        applyTheme()
+
+        // Re-apply theme on Astro page transitions
+        document.addEventListener('astro:page-load', applyTheme)
+      })()
+    </script>
+    <script>
+      // Scroll reveal: section blocks fade and rise the first time they enter the viewport.
+      // The hidden state is only applied from here, so content stays visible without JS.
+      const REVEAL_SELECTOR = 'main > section:not([data-no-reveal]) > div > *:not(astro-island), footer > div > *'
+      const STAGGER_MS = 80
+
+      const observer = new IntersectionObserver(
+        entries => {
+          entries
+            .filter(entry => entry.isIntersecting)
+            .forEach((entry, index) => {
+              const element = entry.target as HTMLElement
+
+              element.style.setProperty('--reveal-delay', `${index * STAGGER_MS}ms`)
+              element.dataset.reveal = 'in'
+              observer.unobserve(element)
+            })
+        },
+        { rootMargin: '0px 0px -10% 0px' }
+      )
+
+      const initReveal = () => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+        document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR).forEach(element => {
+          if (element.dataset.reveal !== undefined) return
+
+          element.dataset.reveal = ''
+          observer.observe(element)
+        })
+      }
+
+      document.addEventListener('astro:page-load', initReveal)
+    </script>
+    <script>
+      // Scroll position memory. Each page's position is remembered when it is left and put back when
+      // the visitor returns to it, in two cases:
+      // - back/forward: the router restores this itself, but when it falls back to a full page load
+      //   nothing does, because it switches the browser's own restoration off;
+      // - links marked data-restore-scroll (e.g. "Back to home"), which are ordinary links and would
+      //   otherwise land at the top.
+      const SCROLL_STORE = 'scroll-by-path'
+      const RESTORE_ONCE = 'scroll-restore-once'
+      const TOLERANCE_PX = 40
+
+      const initScrollMemory = () => {
+        let shouldRestore = performance
+          .getEntriesByType('navigation')
+          .some(entry => (entry as PerformanceNavigationTiming).type === 'back_forward')
+
+        const readPositions = (): Record<string, number> => {
+          try {
+            return JSON.parse(sessionStorage.getItem(SCROLL_STORE) ?? '{}')
+          } catch {
+            return {}
+          }
+        }
+
+        const savePosition = (pathname: string) => {
+          try {
+            const positions = { ...readPositions(), [pathname]: Math.round(window.scrollY) }
+
+            sessionStorage.setItem(SCROLL_STORE, JSON.stringify(positions))
+          } catch {
+            // Storage can be unavailable (private mode); the router's own restore still applies
+          }
+        }
+
+        // The flag lives in sessionStorage so it also survives a full page load
+        const takeRestoreRequest = () => {
+          try {
+            const requested = sessionStorage.getItem(RESTORE_ONCE) === 'true'
+
+            sessionStorage.removeItem(RESTORE_ONCE)
+
+            return requested
+          } catch {
+            return false
+          }
+        }
+
+        const restorePosition = () => {
+          if (takeRestoreRequest()) shouldRestore = true
+
+          const saved = readPositions()[location.pathname]
+
+          if (shouldRestore && saved && Math.abs(window.scrollY - saved) > TOLERANCE_PX) {
+            window.scrollTo({ top: saved, behavior: 'instant' })
+          }
+        }
+
+        // Capture phase, so the request is recorded before the router handles the click
+        document.addEventListener(
+          'click',
+          event => {
+            if (!(event.target as Element | null)?.closest('[data-restore-scroll]')) return
+
+            try {
+              sessionStorage.setItem(RESTORE_ONCE, 'true')
+            } catch {
+              // Without storage the link simply behaves like a normal one
+            }
+          },
+          true
+        )
+
+        window.addEventListener('pagehide', () => savePosition(location.pathname))
+
+        document.addEventListener('astro:before-preparation', event => {
+          // On back/forward the address bar already shows the destination, so take the page being left
+          // from the event rather than from location
+          savePosition(event.from.pathname)
+          shouldRestore = event.navigationType === 'traverse'
+        })
+
+        // after-swap runs before the new page is painted, so there is no jump from the top; page-load
+        // covers full page loads and anything that shifted the layout in between
+        document.addEventListener('astro:after-swap', restorePosition)
+
+        document.addEventListener('astro:page-load', () => {
+          restorePosition()
+          shouldRestore = false
+        })
+      }
+
+      // In dev, the router first loads a page that has client:only islands in a hidden iframe. That
+      // copy shares this tab's sessionStorage, so it would use up the restore request and overwrite
+      // the saved position with 0. Only the real, top-level page keeps scroll memory.
+      if (window.self === window.top) initScrollMemory()
+    </script>
+  </head>
+  <body class='flex min-h-full w-full flex-auto flex-col'>
+    <div class='flex h-full w-full min-w-0 flex-col'>
+      <main class='mx-auto flex w-full max-w-4xl min-w-0 flex-1 flex-col *:scroll-mt-15.5 lg:border-x xl:max-w-245'>
+        <slot />
+      </main>
+
+      <Footer />
+    </div>
+
+    <EdgeBlur />
+    <Toaster client:load />
+    <ScrollProfileToast client:load pathname={Astro.url.pathname} />
+    <NavDock client:load pathname={Astro.url.pathname} />
+  </body>
+</html>

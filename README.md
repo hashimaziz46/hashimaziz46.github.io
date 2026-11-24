@@ -1,29 +1,24 @@
-# Hashim Aziz | Project Portfolio
+# hashimaziz46.github.io
 
-Live site: https://hashimaziz46.github.io/
+Portfolio of Hashim Aziz, Project Manager & Scrum Master. Live at https://hashimaziz46.github.io.
 
-Personal portfolio for Hashim Aziz, Project Manager & Scrum Master. Built with React 19, TypeScript, Vite, Emotion and Framer Motion, based on the [portfolio-01](https://github.com/simpleC0de/portfolio-01) template (MIT).
+Built with [Astro](https://astro.build), React and Tailwind CSS, starting from the free Zolt template by shadcn/studio (see `LICENSE.md`).
 
-## Development
+## Run locally
 
-Requires Node 18+ (Node 20 recommended).
+Needs Node 22.12 or newer and pnpm.
 
 ```bash
-npm install
-npm run dev     # http://localhost:5173/
-npm run build   # production build into dist/
-npm run lint
+pnpm install
+pnpm dev
 ```
 
-## Editing content
+The site runs at http://localhost:4321.
 
-- Name, summary, links, hero stats, section list: `src/data/profile.ts`
-- Experience: `src/components/sections/Experience.tsx`
-- Projects: `src/components/sections/Projects.tsx`
-- Skills: `src/components/sections/Skills.tsx`
-- Education: `src/components/sections/Education.tsx`
-- Resume PDF: replace `public/Hashim-Aziz-Resume.pdf` (keep the file name)
+## Publish
 
-## Deployment
+Every push to `main` builds the site and publishes it to GitHub Pages through `.github/workflows/deploy.yml`.
 
-Every push to `main` builds the site and deploys it to GitHub Pages via `.github/workflows/main.yml`. The `base` in `vite.config.ts` must match the repository name.
+## Booking
+
+The "Book a Call" card opens a Google Calendar appointment schedule. Change the link in `GOOGLE_BOOKING_PAGE` in `src/consts.ts`.
