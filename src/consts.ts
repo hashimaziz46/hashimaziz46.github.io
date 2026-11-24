@@ -79,7 +79,7 @@ export const SITE_METADATA = {
     images: ['/images/og-hashim-aziz.png']
   },
   verification: {
-    google: '', // Add your Google verification code
+    google: 'nuhjLu_iwjeBGpMuZqUx_q55SW7mp_xMmdPWzlyshEg', // Google Search Console
     yandex: '', // Add your Yandex verification code
     bing: '' // Add your Bing verification code
   }
